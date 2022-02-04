@@ -5,9 +5,7 @@ module.exports = {
     width: {
       70: "17rem",
     },
-    fontFamily: {
-      sans: ["Open Sans", "sans-serif"],
-    },
+    fontFamily: {},
     extend: {
       colors: {
         primary: "#393f56",

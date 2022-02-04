@@ -19,15 +19,12 @@
     ></div>
     <div>
       <ul>
-        <li class="hoverText px-6 leading-9 text-white text-xl py-1">Home</li>
-        <li class="hoverText px-6 leading-9 text-white text-xl py-1">
-          Watchlist
-        </li>
-        <li class="hoverText px-6 leading-9 text-white text-xl py-1">
-          Portfolio
-        </li>
-        <li class="hoverText px-6 leading-9 text-white text-xl py-1">
-          Discover
+        <li
+          v-for="(items, index) in navMenu"
+          :key="index"
+          class="hoverText px-6 leading-9 text-white text-xl py-1"
+        >
+          {{ items.name }}
         </li>
       </ul>
     </div>
@@ -37,5 +34,21 @@
 <script>
 export default {
   name: "SideBar",
+  data: () => ({
+    navMenu: [
+      {
+        name: "Home",
+      },
+      {
+        name: "Watchlist",
+      },
+      {
+        name: "Portfolio",
+      },
+      {
+        name: "Discover",
+      },
+    ],
+  }),
 };
 </script>
