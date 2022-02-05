@@ -1,0 +1,29 @@
+select if(com_premium = 'TOTAL','',company) as Company,dtcollection as 'Collection Date',agentname as Agent ,rank  as Rank, Plancode,rate_premium as Premium, com_premium as 'Commission Based', Active,combase as 'Commissionable Amount',netcom as 'Total Commission',comm_rate as 'Rate', if(ifpercentage = 1,concat(Rebates,'%'),rebates) as 'Rebates',Round((rebates/100)* combase,2) as ComRebates from(
+
+select hid,alignment,Company,dtcollection ,agentname  ,rank , Plancode,rate_premium , com_premium,Active,combase,netcom ,comm_rate,rebates,0 as ComRebates,ifpercentage from(
+select hid,alignment,Company,dtcollection ,agentname  ,rank , Plancode,rate_premium , com_premium ,Active,combase,netcom ,comm_rate,rebates,ifpercentage from(
+select hid,alignment,Company,dtcollection ,agentname , rank , Plancode , rate_premium as rate_premium,com_premium as com_premium ,Active,combase as combase ,netcom as netcom ,comm_rate,rebates,ifpercentage from(
+select hid,alignment,agentrank, agentcode, rank, officecode,plantypeid,Company,dtcollection, if(case when status = 'A' then 1 when status = 'R' and TIMESTAMPDIFF(Month,status_date,release_Date) <= 12 then 1 when status = 'I' then 0 when status = 'T' then 0 else 0 end = 1 , agentname,'INTEGRATED MANAGEMENT SERVICES INC.')  as agentname ,rate_premium,com_premium ,sum(noofactive) as active, sum(comm_base) as combase,sum(total_comm) as netcom, comm_rate,plancode,rebates,ifpercentage from(
+select status,status_date,release_date, level_rank as alignment,c.agentcode,o.officecode,c.plantypeid,case company_commission_format when 0 and free = 0 then if(free  = 1,concat(maincode_Desc,' - FREE'),maincode_desc )when 1 then o.classification else ''  end Company,dtcollection,agentrank,agentname, rate_premium,com_premium,noofactive,comm_base,total_Comm,comm_rate, maincode_Desc ,  if(case when status = 'A' then 1 when status = 'R' and TIMESTAMPDIFF(Month,status_date,release_Date) <= 12 then 1 when status = 'I' then 0 when status = 'T' then 0 else 0 end = 1 ,RANK,'ENTITLED')   as rank,c.hid,plancode, if(a.agentcode = crb.codeAgent,crb.rebates,0) as Rebates,if(a.agentcode = crb.codeAgent,crb.ifpercentage,0) ifpercentage
+
+FROM commission c inner join office o on o.officecode = c.officecode inner join agent a on a.agentcode = c.agentcode
+inner join plan_type pt on pt.plantypeid = c.plantypeid inner join commission_rank cr on cr.rankID = c.rnkID left join company_rebates crb
+on crb.company = o.maincode_Desc where release_date = '2021-12-23' ) as tb1 group by plantypeid,hid,company,rank,agentcode,comm_rate order by company,hid,active,alignment) as A) as final
+
+
+
+union all
+select '','',Company,'' ,''  ,'' , '','' , 'TOTAL' , sum(active)active,sum(combase)combase,sum(netcom)netcom ,'',Rebates,ifpercentage from(
+
+select hid,alignment,Company,dtcollection ,agentname  ,rank , Plancode,rate_premium , com_premium , active,combase,sum(netcom)netcom ,comm_rate,rebates,ifpercentage from(
+select hid,alignment,Company,dtcollection ,agentname  ,rank , Plancode , rate_premium as rate_premium,com_premium as com_premium ,Active,combase as combase ,netcom as netcom ,comm_rate,rebates,'0' as comRebates,ifpercentage from(
+select hid,alignment,agentrank, agentcode, rank, officecode,plantypeid,Company,dtcollection,agentname,rate_premium,com_premium,sum(active)active,sum(combase)combase,sum(netcom)netcom,comm_rate,plancode,rebates,ifpercentage  from(
+select hid,alignment,agentrank,agentcode, rank, officecode,plantypeid,Company,dtcollection,agentname,rate_premium, com_premium,active ,combase,sum(netcom)netcom,comm_rate,plancode,rebates , ifpercentage from(
+select hid,alignment,agentrank, agentcode, rank, officecode,plantypeid,Company,dtcollection,if(case when status = 'A' then 1 when status = 'R' and TIMESTAMPDIFF(Month,status_date,release_Date) <= 12 then 1 when status = 'I' then 0 when status = 'T' then 0 else 0 end = 1 ,agentname,'INTEGRATED MANAGEMENT SERVICES INC.') as agentname ,rate_premium,com_premium ,sum(noofactive) as active,sum(comm_base) as combase,sum(total_comm) as netcom, comm_rate,plancode,rebates,ifpercentage from(
+select status,status_date,release_date,level_rank as alignment,c.agentcode,o.officecode,c.plantypeid, case company_commission_format when 0 and free = 0 then if(free  = 1,concat(maincode_Desc,' - FREE'),maincode_desc )when 1 then o.classification else ''  end Company,dtcollection,agentrank,agentname, rate_premium,com_premium,noofactive,comm_base, total_Comm,comm_rate,maincode_Desc ,  if(case when status = 'A' then 1 when status = 'R' and TIMESTAMPDIFF(Month,status_date, release_Date) <= 12 then 1 when status = 'I' then 0 when status = 'T' then 0 else 0 end = 1 ,RANK,'ENTITLED')   as rank,c.hid, plancode,if(a.agentcode = crb.codeAgent,crb.rebates,0) as Rebates,ifpercentage
+
+FROM commission c inner join office o on o.officecode = c.officecode inner join agent a on a.agentcode = c.agentcode inner join plan_type pt on pt.plantypeid = c.plantypeid inner join commission_rank cr on cr.rankID = c.rnkID
+left join company_rebates crb on crb.company = o.maincode_Desc
+where release_date = '2021-12-23' ) as tb1 group by plantypeid,hid,company,rank,agentcode order by company,hid,active,
+alignment) as r11 group by plantypeid,company,hid) as tb3 group by company) as ff)  as final group by company ,plancode
+order by company) as tb2 group by company) as final22 order by company ,com_premium, hid , alignment) finish
